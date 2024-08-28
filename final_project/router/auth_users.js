@@ -67,7 +67,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 	// return res.send(`User ${user} and username ${username}`);
 	
 	// Get list of reviews for the book with isbn
-	let bookReviews = books[isbn];
+	let bookReviews = books[isbn].reviews;
 
 	// Check if user already posted a review. Otherwise, create a new review
 	if(bookReviews[username]){
@@ -81,10 +81,24 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 	
 	bookReviews[username] = userReview;
 	return res.status(200).json({
-		message: "YOur review has been added successfully.",
+		message: "Your review has been added successfully.",
 		review: userReview
 	});
 
+});
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+	// Extract
+	const isbn = req.params.isbn;
+	const username = req.session.authorization['username'];
+	let bookReviews = books[isbn].reviews;
+
+	if(bookReviews[username]){
+		delete bookReviews[username];
+		return res.status(200).json({message: "Review successfully deleted."});
+	}
+	return res.send({message: "No review to be deleted."});
 });
 
 module.exports.authenticated = regd_users;
